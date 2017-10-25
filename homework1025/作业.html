@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="node_modules/vue/dist/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <shop-goods
+            v-for="(good, index) in goods"
+            :price="good.price"
+            :index="index"
+            :key="index"
+            @pass="total">
+    </shop-goods>
+    <p>总价: {{totalPrice}}</p>
+</div>
+<script>
+    Vue.component('shop-goods',{
+        template:`
+           <div>
+               <p>单价：{{price}}</p>
+               <button @click="sub"></button>
+               <span>{{count}} 件</span>
+               <button @click="sum"></button>
+           </div>
+        `,
+        props:['price','index'],
+        data:function () {
+            return{
+                count:0
+            }
+        },
+        methods:{
+            sum:function () {
+                this.count++;
+                this.$emit('pass',this.count,this.index)
+            },
+            sub:function () {
+                if (this.count <= 0){this.count = 0; return;}
+                this.count--;
+                this.$emit('pass',this.count,this.index)
+            }
+        }
+    });
+    new Vue({
+        el:'#app',
+        data:{
+            goods:[
+                {price:100,count:0},
+                {price:200,count:0},
+                {price:3.00,count:0}
+            ]
+        },
+        methods:{
+            total:function (count,index) {
+                this.goods[index].count = count
+            }
+        },
+        computed:{
+            totalPrice:function () {
+                var total = 0;
+                for (var i = 0; i < this.goods.length; i++){
+                    total += this.goods[i].count * this.goods[i].price;
+                }
+                return total;
+            }
+        }
+    })
+</script>
+</body>
+</html>
